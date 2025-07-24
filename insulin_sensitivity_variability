@@ -1,0 +1,64 @@
+%% Simulation Loop
+tstam = 0:simulator.ts:simulator.sim_time - simulator.ts;
+parallel_computing = (length(cohort)>=minimum_npatients_for_parallel)*maximum_nworkers;
+% variable copies to allow for parfor and reduce data transfer burden
+controller_parfor = hardware.controller;
+time_span         = (1:5:simulator.sim_time);
+% parfor (subject=1:length(cohort),parallel_computing)
+for subject = 1:length(cohort)
+    fprintf('Running %s\n',cohort(subject).name);
+    % variables defined to allow parfor and reduce data transfer burden
+    exercise_management = scenario.exercise.management;
+    simulator_parfor  = simulator;
+    Ra                = 0;
+    Mean_PGUA_1       = 0;
+    exercise_end      = 0;
+    exercise_start    = 0;
+    Tmaxrescue        = 20;
+    % Load Virtual patient
+    SensitivityFactor = 1; % TODO CHANGE THIS WHEN GENERATING PATIENTS MAYBE?
+    patient           = virtualPatient_Hovorka(SensitivityFactor, cohort(subject).params);
+    % Controller initialization for each patient
+    controller_parfor(subject)          = init_mycontroller(simulator_parfor, scenario, cohort, controller_parfor(subject), subject, patient);
+    simulator_parfor.MDI_insulin_type   = controller_parfor(subject).MDI.insulin_type;    
+    
+    % Initialization of announcement structures
+    Meal_announcement     = struct('gramsCHO', 0, 'Ra', 0);
+    Exercise_announcement = struct('intensity', 0, 'duration', 0);
+    
+    % Virtual Patient Initial Conditions
+    xguess  = ones(9, 1);
+    options = optimset('Diagnostics', 'off', 'Display', 'off');
+    [x, fval, exitflag] = fsolve(@(x) model_hovorka_SS(x, cohort(subject).basal*1000/60, patient), xguess, options);
+    if (controller_parfor(subject).MDI.enabled)
+        [x, fval, exitflag]        = fsolve(@(x) model_hovorka_SS(x, 0, patient), xguess, options);
+        long_acting_insulin        = struct;
+        long_acting_insulin.adjust = controller_parfor(subject).specific.slow_insulin_dose;
+        long_acting_insulin.hour   = controller_parfor(subject).specific.time_injection;
+        long_acting_insulin.type   = controller_parfor(subject).MDI.insulin_type;
+        x_slowinsulin              = initial_states_slowinsulin(long_acting_insulin,1,scenario.intra_variability);
+        Xkm1 = [x', 0, 0, x_slowinsulin', 0, 0, 0, 0,]; % Adding Carbohydrates States + Slow Insulin Compartments
+    else
+        Xkm1 = [x', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; % No slow acting insulin        
+    end
+%FUNICÓ MODIFICADA
+% variabilitat de la sensibilitat a la insulina segons les fases del cicle menstrual
+if (scenario.intra_variability.enabled)
+   % Definir la durada de cada fase (en dies) i els factors de SI
+   phase_durations = [5, 6, 7, 6, 6];  % in days
+   phase_SI_values = [1.058, 1.173, 1.000, 0.92, 0.881];
+   % Construir el vector de variabilitat de la sensibilitat a la insulina
+   bins_per_day = 288;
+   % Build insulin_sensitivity_variability vector
+   insulin_sensitivity_variability = [];
+   for i = 1:length(phase_durations)
+       n_bins = phase_durations(i) * bins_per_day;
+       insulin_sensitivity_variability = [insulin_sensitivity_variability ...
+                                          repmat(phase_SI_values(i), 1, n_bins)];
+   end
+   % En cas que el total de dies del simulador sigui >30 (o <30), ajustar la longitud del vector
+   total_bins_needed = scenario.ndays * bins_per_day;
+   insulin_sensitivity_variability = insulin_sensitivity_variability(1:total_bins_needed);
+else
+   insulin_sensitivity_variability = ones(1, scenario.ndays * 288);
+end
