@@ -1,4 +1,4 @@
-# Mariona-Blancafort-Ars
+# TFG_Mariona-Blancafort-Ars
 Aquest projecte de Treball de Fi de Grau forma part de l’estudi sobre l'impacte del cicle menstrual en el control glucèmic de dones amb diabetis mellitus tipus 1 (DM1). S’ha desenvolupat un sistema de simulació capaç d’integrar la variabilitat de la sensibilitat a la insulina segons les diferents fases hormonals del cicle menstrual, així com un ajust terapèutic adaptatiu per millorar el control glucèmic dins d’un entorn virtual.
 
 
@@ -14,7 +14,7 @@ Funció que genera un perfil cíclic de sensibilitat a la insulina (SI) en funci
 Script que defineix els paràmetres de control individualitzats per a cada pacient virtual. Incorpora un algorisme d’ajust terapèutic personalitzat, que modifica els valors de CR, CF i insulina basal segons la fase del cicle i el perfil glucèmic (hipoglucèmia o hiperglucèmia) del pacient.
 
 
-docs/: Una còpia de l’article científic original del simulador emprat (Estremera et al., 2022) per contextualitzar-ne l’origen i el funcionament base.
+docs_articleSimulador: Una còpia de l’article científic original del simulador emprat (Estremera et al., 2022) per contextualitzar-ne l’origen i el funcionament base.
 
 results/: Conté els resultats de les simulacions realitzades amb les modificacions implementades. S’hi inclouen fitxers .mat amb les dades simulades i informes AGP (Ambulatory Glucose Profile) generats per a l’anàlisi dels perfils glucèmics.
 Degut al gran volum total d’informes generats, només s’hi adjunten alguns exemples representatius per facilitar la consulta i il·lustrar els diferents escenaris simulats.
