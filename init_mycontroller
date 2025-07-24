@@ -1,0 +1,92 @@
+% MDI Configuration
+controller.MDI.insulin_type = 'none';
+if (controller.MDI.enabled)
+    controller.MDI.glargine_100              = false;
+    controller.MDI.glargine_300              = true; 
+    controller.MDI.degludec                  = false; 
+    controller.specific.time_injection       = 20;    %[h] 
+    if (controller.MDI.glargine_100)
+        controller.MDI.insulin_type           = 'Glargine100';
+        if controller.specific.time_injection   == 20    %[h]
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Gla100_20H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Gla100_20H; %(g/U)
+        else
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Gla100_9H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Gla100_9H; %(g/U)
+        end
+    elseif (controller.MDI.glargine_300)
+        controller.MDI.insulin_type           = 'Glargine300';
+        if controller.specific.time_injection   == 20    %[h]
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Gla300_20H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Gla300_20H; %(g/U)
+        else
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Gla300_9H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Gla300_9H; %(g/U)
+        end
+    elseif (controller.MDI.degludec)
+        controller.MDI.insulin_type           = 'Degludec';
+        if controller.specific.time_injection   == 20    %[h]
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Degludec_20H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Degludec_20H; %(g/U)
+        else
+            controller.specific.slow_insulin_dose = cohort(subject).Bolus_Degludec_9H;  %[mU]
+            controller.specific.CR                = cohort(subject).CR_MDI_Degludec_9H; %(g/U)
+        end
+    end
+end
+
+% History Variables
+controller.history.C1           = [];
+controller.history.C2           = [];
+controller.history.IOB          = [];
+controller.history.bolus        = [];
+controller.history.basalinsulin = [];
+
+% Ajustos personalitzats per subjectes amb moltes hipos
+subject_name = cohort(subject).name;
+
+%MODIFICACIÓ AJUST TERÀPIA
+% Llista de pacients 
+hipos_patients = {'Subject_1', 'Subject_2', 'Subject_3', 'Subject_4'};
+hipers_patients = {'Subject_5', 'Subject_6', 'Subject_7', 'Subject_8', Subject_8'};
+% Fases del cicle: 1 a 5 (durades en dies)
+phase_durations = [5, 6, 7, 6, 6];
+follicular_phases = [1, 2, 3];
+luteal_phases = [4, 5];
+subject_name = cohort(subject).name;
+current_phase = get_current_cycle_phase(day, phase_durations); % Funció que determina fase
+if ismember(subject_name, hipos_patients)
+   % Pacients amb mal control d’hipoglucèmies
+   if ismember(current_phase, follicular_phases)
+       controller.specific.CR = controller.specific.CR * 1.05;
+       controller.specific.CF = controller.specific.CF * 1.10;
+       controller.specific.basal_ins_CSII = controller.specific.basal_ins_CSII * 0.975;
+       controller.specific.rescueCHO.enabled = true;
+ elseif ismember(current_phase, luteal_phases)
+       controller.specific.CR = controller.specific.CR * 1.10;
+       controller.specific.CF = controller.specific.CF * 1.20;
+       controller.specific.basal_ins_CSII = controller.specific.basal_ins_CSII * 0.95;
+       controller.specific.rescueCHO.enabled = true;
+   end
+elseif ismember(subject_name, hipers_patients)
+   % Pacients amb mal control d’hiperglucèmies
+   if ismember(current_phase, follicular_phases)
+       controller.specific.CR = controller.specific.CR * 0.85;
+       controller.specific.CF = controller.specific.CF * 0.85;
+       controller.specific.basal_ins_CSII = controller.specific.basal_ins_CSII * 1.10;
+       controller.specific.rescueCHO.enabled = false;
+   elseif ismember(current_phase, luteal_phases)
+       controller.specific.CR = controller.specific.CR * 0.90;
+       controller.specific.CF = controller.specific.CF * 0.90;
+       controller.specific.basal_ins_CSII = controller.specific.basal_ins_CSII * 1.05;
+       controller.specific.rescueCHO.enabled = false;
+   end
+end
+% Paràmetres de CHO rescat si s’activa
+if controller.specific.rescueCHO.enabled
+   controller.specific.rescueCHO.hypo_threshold_for_rescues = 54;
+   controller.specific.rescueCHO.rescuecarbs_dose = 15;
+   controller.specific.rescueCHO.preventive_threshold = 80;
+   controller.specific.rescueCHO.preventivecarbs_dose = 5;
+end
+
