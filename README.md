@@ -3,14 +3,14 @@ Aquest projecte de Treball de Fi de Grau forma part de l’estudi sobre l'impact
 
 
 # Estructura del repositori
-Aquest repositori inclou exclusivament les dues principals modificacions realitzades sobre el simulador original, desenvolupat per Estremera et al. en l’article “A simulator with realistic and challenging scenarios for virtual T1D patients undergoing CSII and MDI therapy” (2022). Per motius de confidencialitat i propietat intel·lectual, aquest repositori només conté els fitxers propis desenvolupats en el marc del present treball. Si teniu interès a accedir al simulador complet, a les dades originals o a més informació del projecte, podeu contactar amb la càtedra DEXCOM - MICELab de la Universitat de Girona, que coordina i custodia el material sota condicions d’ús regulades.
+Aquest repositori fragments de codi Matlab del simulador, desenvolupat per Estremera et al. en l’article “A simulator with realistic and challenging scenarios for virtual T1D patients undergoing CSII and MDI therapy” (2022). Per motius de confidencialitat i propietat intel·lectual, aquest repositori només conté els fitxers propis desenvolupats en el marc del present treball. Si teniu interès a accedir al simulador complet, a les dades originals o a més informació del projecte, podeu contactar amb la càtedra DEXCOM - MICELab de la Universitat de Girona, que coordina i custodia el material sota condicions d’ús regulades.
 
-Els fitxers inclosos són:
+Concretament, els fitxers inclosos tracten de dues parts fonamentals del simulador original que han estat modificades per tal d’integrar, d’una banda, la variació cíclica de la sensibilitat a la insulina i, de l’altra, un algorisme d’ajust terapèutic personalitzat. Només s’hi ha inclòs el fragment específic de cada script (main.m i init_mycontroller.m) on s’ha realitzat la modificació. Els fitxer són:
 
-- insulin_sensitivity_variability.m:
+- insulin_sensitivity_variability:
 Funció que genera un perfil cíclic de sensibilitat a la insulina (SI) en funció de les cinc fases del cicle menstrual. Aquesta variabilitat es calcula a partir de dades reals de pacients i s’integra dinàmicament en el simulador per reproduir l’impacte hormonal mensual en el control glucèmic.
 
-- init_mycontroller.m:
+- init_mycontroller:
 Script que defineix els paràmetres de control individualitzats per a cada pacient virtual. Incorpora un algorisme d’ajust terapèutic personalitzat, que modifica els valors de CR, CF i insulina basal segons la fase del cicle i el perfil glucèmic (hipoglucèmia o hiperglucèmia) del pacient.
 
 
