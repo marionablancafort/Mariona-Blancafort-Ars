@@ -3,7 +3,7 @@ Aquest projecte de Treball de Fi de Grau forma part de l’estudi sobre l'impact
 
 
 # Estructura del repositori
-Aquest repositori inclou exclusivament les dues principals modificacions realitzades sobre el simulador original, desenvolupat per Estremera et al. en l’article “A simulator with realistic and challenging scenarios for virtual T1D patients undergoing CSII and MDI therapy” (2022). Degut a la confidencialitat i restriccions de difusió del codi complet del simulador, no s’inclou la totalitat del projecte, sinó únicament els fitxers propis del present Treball de Fi de Grau, que contenen les funcionalitats desenvolupades.
+Aquest repositori inclou exclusivament les dues principals modificacions realitzades sobre el simulador original, desenvolupat per Estremera et al. en l’article “A simulator with realistic and challenging scenarios for virtual T1D patients undergoing CSII and MDI therapy” (2022). Per motius de confidencialitat i propietat intel·lectual, aquest repositori només conté els fitxers propis desenvolupats en el marc del present treball. Si teniu interès a accedir al simulador complet, a les dades originals o a més informació del projecte, podeu contactar amb la càtedra DEXCOM - MICELab de la Universitat de Girona, que coordina i custodia el material sota condicions d’ús regulades.
 
 Els fitxers inclosos són:
 
